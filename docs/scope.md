@@ -13,11 +13,11 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 |---|---|
 | Characters | 2 characters, built one at a time: **Character 1 = Stun opener**, **Character 2 = Slow opener** |
 | Movement | Walk, run (double-tap), jump, double jump, ground dash, air dash (dash direction = facing, for now) |
-| Attacks (per character) | Jab, side strong, forward aerial, up aerial, neutral special |
+| Attacks (per character) | Jab, side strong, forward aerial, up aerial, down aerial, neutral special |
 | Combat | Damage %, knockback that scales with damage, blast zones, stocks |
 | Combo openers | Stun (with stun decay + cooldown), Slow (timer + cooldown) |
 | Cancels | Attack → attack, attack → dash |
-| Anti-infinite | Combo scaling (less hitstun per hit) + repeat decay (same move weakens) |
+| Anti-infinite | Combo scaling (decreased hitstun for consecutive hits, providing an end to combos) + attack decay (using same attack repeatedly within a short window has decreased damage) |
 | Defense | Shield |
 | Content | 1 stage |
 | Modes | Versus (local), vs CPU |
@@ -45,7 +45,7 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 | Attacks | Directional normals (up / down / forward) |
 | Attacks | Directional specials (up / down / side) |
 | Attacks | Up strong, down strong |
-| Attacks | Neutral aerial, down aerial |
+| Attacks | Neutral aerial, back aerial |
 | Attacks | Dash attack |
 
 ## Controls
@@ -57,8 +57,12 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 | Run | Double-tap A or D | Double-tap Left or Right |
 | Jump | Space | Right Shift |
 | Dash | Left Shift | Right Ctrl |
-| Attack (jab on ground; in air: up aerial if holding up, else forward aerial) | P | . (period) |
+| Attack (jab on ground; in air: up aerial if holding up, down aerial if holding down, else forward aerial) | P | . (period) |
 | Special | O | , (comma) |
 | Strong (aerial in the air) | I | / (slash) |
 | Menus: confirm | Enter | Enter |
 | Debug: toggle Slow on P2 | F1 | — |
+
+## Changes
+
+- Oct 6: Down aerial moved Stretch → Core (already implemented; covers below for edge-guarding). Back aerial added to Stretch.

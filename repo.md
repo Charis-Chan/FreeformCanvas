@@ -3,7 +3,7 @@ assets/             - anything to load (art, sounds, fonts)
 data/               - tuning values, level data
 docs/               - documentation for the game
 - gdd.md            - game design document
-- postmortem.md     - 
+- postmortem.md     - post-project reflection (written at the end)
 - scope.md          - locked scope (core / polish / stretch) and controls
 src/                - the game
 - fighter.odin      - fighter entity: input, stats, moves/hitboxes, movement and attack state machine

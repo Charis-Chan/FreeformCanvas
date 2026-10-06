@@ -138,7 +138,7 @@ Attack_Data :: struct {
 // Placeholder frame data so the attack states can be seen and timed. 
 /*
 	For hitboxes:
-	{how far from origin point horizonatally in direction of facing: (middle of body; the top left of hitbox starts from that point),
+	{how far from origin point horizontally in direction of facing: (middle of body; the top left of hitbox starts from that point),
 	how high from bottom should the hitbox be (the hitbox extends downward: negative is higher),
 	how long the hitbox should be horizontally,
 	how tall it should be vertically}
@@ -171,7 +171,7 @@ select_move :: proc(grounded: bool, pressed, held: Input) -> (move: Move, ok: bo
 		if .Special in pressed do return .Neutral_Special, true
 	} else {
 		// Strong has no air version, so in the air it gives an aerial
-		// instead of eating the input. No neutral/down aerial yet (stretch),
+		// instead of eating the input. No neutral/back aerial yet (stretch),
 		// so anything that isn't up gives the forward aerial.
 		if .Attack in pressed || .Strong in pressed {
 			if (.Up in held){
