@@ -30,7 +30,7 @@ MOVE_LABELS := [Move]cstring {
 	.Neutral_Special = "NEUTRAL SPECIAL",
 	.Forward_Aerial  = "FORWARD AERIAL",
 	.Up_Aerial       = "UP AERIAL",
-    .Down_Aerial     = "DOWN AERIAL"
+	.Down_Aerial     = "DOWN AERIAL",
 }
 
 render :: proc(game: Game) {

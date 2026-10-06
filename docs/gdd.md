@@ -3,6 +3,7 @@
 Student Name: Charis Chan  
 Student ID: 100876550  
 Date:September 21, 2026  
+Updated: October 7, 2026
 Class: CSCI 4160U Game Development  
 Repository Link: [https://github.com/Charis-Chan/FreeformCanvas.git](https://github.com/Charis-Chan/FreeformCanvas.git)
 
@@ -13,41 +14,45 @@ A platform fighter with the ability to cancel attacks and dashes. It will contai
 ## **Core Gameplay Loop**
 
 ### **The Gameplay Loop:** 
-The player will play against another player and try to kill the opponent by knocking them off screen while trying to stay alive themselves. Kill other player’s lives before running out of your own lives.
+The player will play against another player or a CPU opponent and try to kill the opponent by knocking them off screen while trying to stay alive themselves. Kill other player’s lives before running out of your own lives.
 
 ### **Primary Mechanics:** 
 
-- Playable character: jump, double jump, walk, run, normals, strongs, specials, aerials, dashes
+- Playable character: jump, double jump, walk, run, normals, strongs, specials, aerials, dashes, shields
+- Scope locked for CP2, see docs/scope.md
 
-### **Secondary Mechanics:** 
+### **Secondary Mechanics (Core — see docs/scope.md):** 
 
-- Freeform combo openers:   
-  - Stun (I)  
-    - Only certain attacks will stun  
-    - Base knockback of stun attacks will be halved (maybe quartered)  
-      - Opens up combo routes  
-    - Stun wears off after 3-5? stun attacks  
-      - Start with 5, adjust when balancing/testing  
-    - Cooldown of 1-3 seconds to prevent stun locking  
-      - Start with 1, adjust when balancing  
-  - Slow (II)  
-    - Short timer  
-      - Active for a certain amount of time (5? sec)  
-      - Start with 5, adjust when balancing/testing  
-    - Timer cooldown  
-      - 3-5 seconds  
-        - Start with 3, adjust when balancing/testing  
+- Freeform combo openers:  
+	- Character 1: Stun (I)  
+		- Only certain attacks will stun  
+		- Base knockback of stun attacks will be halved (maybe quartered)  
+			- Opens up combo routes  
+		- Stun wears off after 3-5? stun attacks  
+			- Start with 5, adjust when balancing/testing  
+		- Cooldown of 1-3 seconds to prevent stun locking  
+			- Start with 1, adjust when balancing  
+	- Character 2: Slow (II)  
+		- Short timer  
+			- Active for a certain amount of time (5? sec)  
+			- Start with 5, adjust when balancing/testing  
+		- Timer cooldown  
+			- 3-5 seconds  
+				- Start with 3, adjust when balancing/testing  
 - Combo extender (mostly grounded \+ aerial)  
-  - attack canceling into attacks (turbo)  
-  - attacks canceling into dashes
+	- attack canceling into attacks (turbo)  
+	- attacks canceling into dashes
+- Anti-infinites:
+	- combo scaling: decreased hitstun for consecutive hits, providing an end to combos
+	- attack decay: using same attack repeatedly within a short window has decreased damage
 
-### **Tertiary Mechanics:** 
+### **Tertiary Mechanics (Stretch — see docs/scope.md):** 
 
 - Combo extender (strictly aerial):  
-  - Platform spawner  
-  - Wall jumps  
-  - Wall slides slow fall  
-- Defensive mechanics: shields/blocks, grabs, parries  
+	- Platform spawner  
+	- Wall jumps  
+	- Wall slides slow fall  
+- Defensive mechanics: grabs, parries  
 - Training mode
 
 ## **MDA Framework**
@@ -78,12 +83,12 @@ The player will play against another player and try to kill the opponent by knoc
 ### **How should they feel? (Incorporate Leblanc’s Taxonomy of pleasures):**
 
 - Expression  
-  - Combos are meant to be as free as possible, letting players form their own combos unique to their playstyle  
+	- Combos are meant to be as free as possible, letting players form their own combos unique to their playstyle  
 - Challenge  
-  - Creating own combos, trying to improvise while staying alive  
+	- Creating own combos, trying to improvise while staying alive  
 - Fellowship  
-  - Playing with others to increase enjoyment  
-  - Rivalry 
+	- Playing with others to increase enjoyment  
+	- Rivalry 
 
 ## **Game Inspirations:**
 
@@ -102,13 +107,13 @@ Platform Fighter
 ## **Target Audience (Incorporate Bartle’s Taxonomy):**
 
 - Killers  
-  - Compete with other player to be last one standing
+	- Compete with other player to be last one standing
 
 ## **Progression Over Time:**
 
 - Expected Player Growth  
-  - Players get better at their combos  
-  - Able to improvise more freely with more experience with the characters
+	- Players get better at their combos  
+	- Able to improvise more freely with more experience with the characters
 
 ## **Themes:**
 Creative harmony
@@ -119,7 +124,7 @@ Creative harmony
 - Odin  
 - Raylib  
 - Potential Spriting:  
-  - Libresprite  
-  - Pixel Studio
+	- Libresprite  
+	- Pixel Studio
 
 ## **Anything else unusual that needs explaining (if applicable):**  

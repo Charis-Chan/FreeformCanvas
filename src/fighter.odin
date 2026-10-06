@@ -110,7 +110,7 @@ Move :: enum {
 	Neutral_Special,
 	Forward_Aerial,
 	Up_Aerial,
-    Down_Aerial,
+	Down_Aerial,
 }
 
 // The combo openers from the GDD; each character's gimmick is attached to
@@ -137,19 +137,19 @@ Attack_Data :: struct {
 
 // Placeholder frame data so the attack states can be seen and timed. 
 /*
-    For hitboxes:
-    {how far from origin point horizonatally in direction of facing: (middle of body; the bottom left of hitbox starts from that point),
-    how high from bottom should the hitbox be(nnegative is higher)
-    how long the hitbox should be horizontally
-    how tall it should be vertically
+	For hitboxes:
+	{how far from origin point horizonatally in direction of facing: (middle of body; the top left of hitbox starts from that point),
+	how high from bottom should the hitbox be (the hitbox extends downward: negative is higher),
+	how long the hitbox should be horizontally,
+	how tall it should be vertically}
 */
 MOVES := [Move]Attack_Data {
 	.Jab             = {startup = 4,  active = 3, recovery = 10, hitbox = {20, -60, 45, 25},    damage = 3},
 	.Side_Strong     = {startup = 15, active = 8, recovery = 25, hitbox = {20, -70, 70, 40},    damage = 14},
 	.Neutral_Special = {startup = 7,  active = 5, recovery = 17, hitbox = {25, -75, 60, 50},    damage = 8},
-	.Forward_Aerial  = {startup = 6,  active = 5, recovery = 12, hitbox = {75, -75, 55, 45},    damage = 7},
+	.Forward_Aerial  = {startup = 6,  active = 5, recovery = 12, hitbox = {25, -75, 90, 45},    damage = 7},
 	.Up_Aerial       = {startup = 5,  active = 5, recovery = 12, hitbox = {-35, -135, 70, 50},  damage = 6},
-    .Down_Aerial     = {startup = 5,  active = 5, recovery = 12, hitbox = {-35, -5, 70, 50},   damage = 8},
+	.Down_Aerial     = {startup = 5,  active = 5, recovery = 12, hitbox = {-35, -5, 70, 50},    damage = 8},
 }
 
 attack_total_frames :: proc(a: Attack_Data) -> int {
@@ -174,13 +174,13 @@ select_move :: proc(grounded: bool, pressed, held: Input) -> (move: Move, ok: bo
 		// instead of eating the input. No neutral/down aerial yet (stretch),
 		// so anything that isn't up gives the forward aerial.
 		if .Attack in pressed || .Strong in pressed {
-            if (.Up in held){
-                return .Up_Aerial, true
-            }else if (.Down in held){
-                return .Down_Aerial, true
-            }else {
-                return .Forward_Aerial, true
-            }
+			if (.Up in held){
+				return .Up_Aerial, true
+			}else if (.Down in held){
+				return .Down_Aerial, true
+			}else {
+				return .Forward_Aerial, true
+			}
 		}
 		if .Special in pressed do return .Neutral_Special, true
 	}

@@ -11,9 +11,9 @@
 |---|---|---|---|
 | `src/main.odin` | Claude Code (Anthropic) | CP2 skeleton: fixed-timestep loop with update/render split | |
 | `src/game.odin` | Claude Code (Anthropic) | CP2 skeleton: Title / Match / Results game states | |
-| `src/fighter.odin` | Claude Code (Anthropic) | Fighter entity as data (stats, moves, input), movement (walk, run, jump, double jump, ground/air dash), ground vs air attack selection, per-fighter time scale for Slow | |
+| `src/fighter.odin` | Claude Code (Anthropic) | Fighter entity as data (stats, moves, input), movement (walk, run, jump, double jump, ground/air dash), ground vs air attack selection, per-fighter time scale for Slow | Added a temporary Down_Aerial (move, frame data, hitbox, selection); retuned Side_Strong, Neutral_Special frame data and Forward_Aerial hitbox; added hitbox explanation comment |
 | `src/stage.odin` | Claude Code (Anthropic) | Stage and platform data | |
-| `src/render.odin` | Claude Code (Anthropic) | All drawing, separate from game logic | |
+| `src/render.odin` | Claude Code (Anthropic) | All drawing, separate from game logic | Added a temporary Down_Aerial label |
 | `docs/scope.md` | Claude Code (Anthropic) | Core / polish / stretch scope table from my design decisions | |
 
 Design decisions (characters, openers, controls, which moves are core) are
