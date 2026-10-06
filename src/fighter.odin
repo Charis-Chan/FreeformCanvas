@@ -11,6 +11,10 @@ Vec2 :: rl.Vector2
 // Two presses of the same direction within this many ticks starts a run.
 DOUBLE_TAP_WINDOW :: 12
 
+// Ticks after pressing neutral special during which holding the opposite
+// direction turns the fighter around and reverses their momentum (B-reverse).
+B_REVERSE_WINDOW :: 5
+
 Button :: enum {
 	Left, Right, Up, Down,
 	Jump, Dash,
@@ -172,7 +176,8 @@ select_move :: proc(grounded: bool, pressed, held: Input) -> (move: Move, ok: bo
 	} else {
 		// Strong has no air version, so in the air it gives an aerial
 		// instead of eating the input. No neutral/back aerial yet (stretch),
-		// so anything that isn't up gives the forward aerial.
+		// so anything that isn't up or down gives the forward aerial, in the
+		// direction the fighter is facing.
 		if .Attack in pressed || .Strong in pressed {
 			if (.Up in held){
 				return .Up_Aerial, true
@@ -219,6 +224,8 @@ Fighter :: struct {
 	// Double-tap detection for running.
 	tap_dir:   f32, // direction of the last tap: -1, 0 or +1
 	tap_timer: int, // ticks left to tap the same direction again
+
+	b_reversed: bool, // already B-reversed during the current attack
 
 
 	damage: f32,
@@ -320,8 +327,8 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 		}
 
 	case .Airborne:
-		if dir != 0 do f.facing = dir
-
+		// No turning in the air: facing stays as it was when you left the
+		// ground. Holding the other way only drifts you backwards.
 		if try_start_attack(f, pressed, input) {
 			// attack started
 		} else if .Dash in pressed && f.dash_cooldown == 0 && f.air_dashes_left > 0 {
@@ -344,6 +351,15 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 		}
 
 	case .Attack:
+		// B-reverse: early in neutral special, holding the opposite
+		// direction turns you around and flips your horizontal momentum.
+		if f.move == .Neutral_Special && !f.b_reversed &&
+		   f.state_frame <= B_REVERSE_WINDOW && dir == -f.facing {
+			f.facing = -f.facing
+			f.vel.x = -f.vel.x
+			f.b_reversed = true
+		}
+
 		if f.grounded {
 			f.vel.x = 0
 		} else {
@@ -372,11 +388,16 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 	f.state_frame += 1
 }
 
-// Which way a dash goes. For now: straight ahead in the facing direction.
-// To make dashes follow the held direction later (e.g. 8-way air dash), only
-// this procedure needs to change; dash_dir is already a 2D vector.
+// Which way a dash goes: the held left/right direction, or the facing
+// direction if neither is held. This does not turn the fighter, so in the
+// air you can dash backwards while still facing forwards.
+// dash_dir is a 2D vector, so diagonal/8-way dashes only need changes here.
 dash_direction :: proc(f: ^Fighter, input: Input) -> Vec2 {
-	return {f.facing, 0}
+	dir: f32
+	if .Left in input do dir -= 1
+	if .Right in input do dir += 1
+	if dir == 0 do dir = f.facing
+	return {dir, 0}
 }
 
 start_dash :: proc(f: ^Fighter, input: Input) {
@@ -389,6 +410,7 @@ try_start_attack :: proc(f: ^Fighter, pressed, held: Input) -> bool {
 	move, ok := select_move(f.grounded, pressed, held)
 	if !ok do return false
 	f.move = move
+	f.b_reversed = false
 	set_state(f, .Attack)
 	return true
 }
