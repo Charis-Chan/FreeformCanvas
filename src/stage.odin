@@ -1,6 +1,9 @@
 package main
 
 import rl "vendor:raylib"
+import "core:os"
+import "core:encoding/json"
+import "core:fmt"
 
 Platform :: struct {
 	rect: rl.Rectangle,
@@ -27,4 +30,14 @@ make_default_stage :: proc() -> Stage {
 		blast_zone = {-300, -400, 1880, 1500},
 		spawns     = {{450, 520}, {830, 520}},
 	}
+}
+
+load_stage :: proc(path: string) -> (stage: Stage, ok: bool) {
+	// A. read the file
+	data, read_err := os.read_entire_file("data/stages/main.json", context.allocator)
+	// B. if reading failed: print an error and return
+	// C. make sure the file bytes get freed
+	// D. parse the JSON into `stage`
+	// E. if parsing failed: print an error and return
+	// F. success
 }

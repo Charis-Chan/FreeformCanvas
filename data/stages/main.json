@@ -1,0 +1,12 @@
+{
+    "platforms": [
+        { "rect": {"x": 290, "y": 520, "width": 700, "height": 200}, "soft": false},
+        { "rect": {"x": 390, "y": 380, "width": 180, "height": 12}, "soft": true},
+        { "rect": {"x": 710, "y": 380, "width": 180, "height": 12}, "soft": true},
+        { "rect": {"x": 550, "y": 250, "width": 180, "height": 12}, "soft": true}
+    ],
+
+    "blast_zone": {"x": -300, "y": -400, "width": 1880, "height": 1500},
+
+    "spawns": [[450, 520], [830, 520]]
+}
