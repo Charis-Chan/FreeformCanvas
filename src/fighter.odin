@@ -8,13 +8,6 @@ Vec2 :: rl.Vector2
 // Input
 // ---------------------------------------------------------------------------
 
-// Two presses of the same direction within this many ticks starts a run.
-DOUBLE_TAP_WINDOW :: 12
-
-// Ticks after pressing neutral special during which holding the opposite
-// direction turns the fighter around and reverses their momentum (B-reverse).
-B_REVERSE_WINDOW :: 5
-
 Button :: enum {
 	Left, Right, Up, Down,
 	Jump, Dash,
@@ -69,7 +62,8 @@ read_input :: proc(bindings: Key_Bindings) -> Input {
 }
 
 // ---------------------------------------------------------------------------
-// Data: stats and moves (per character, shared by every fighter using them)
+// Data: stats and moves (per character, shared by every fighter using them).
+// The values live in data/characters/*.json; see data.odin.
 // ---------------------------------------------------------------------------
 
 // All speeds are in pixels per tick, gravity in pixels per tick^2.
@@ -90,24 +84,6 @@ Fighter_Stats :: struct {
 	max_air_dashes:       int, // refreshed on landing
 }
 
-// Tuning values. Move to a data file in CP3.
-DEFAULT_STATS := Fighter_Stats {
-	size                 = {50, 90},
-	walk_speed           = 5,
-	run_speed            = 8.5,
-	air_speed            = 4.5,
-	air_accel            = 0.5,
-	gravity              = 0.6,
-	max_fall_speed       = 12,
-	jump_velocity        = 13,
-	double_jump_velocity = 11,
-	max_air_jumps        = 1,
-	dash_speed           = 12,
-	dash_frames          = 10,
-	dash_cooldown        = 20,
-	max_air_dashes       = 1,
-}
-
 Move :: enum {
 	Jab,
 	Side_Strong,
@@ -126,7 +102,8 @@ Opener :: enum {
 }
 
 // One attack. Frame counts are in ticks. The hitbox is relative to the
-// fighter's feet while facing right; it is mirrored when facing left.
+// fighter's feet while facing right; it is mirrored when facing left
+// (see the hitbox explanation in data/characters/lucy.json).
 // Damage/knockback/opener are not applied yet (collision week, Oct 26).
 Attack_Data :: struct {
 	startup:          int,
@@ -137,23 +114,6 @@ Attack_Data :: struct {
 	base_knockback:   f32,
 	knockback_growth: f32,
 	opener:           Opener,
-}
-
-// Placeholder frame data so the attack states can be seen and timed. 
-/*
-	For hitboxes:
-	{how far from origin point horizontally in direction of facing: (middle of body; the top left of hitbox starts from that point),
-	how high from bottom should the hitbox be (the hitbox extends downward: negative is higher),
-	how long the hitbox should be horizontally,
-	how tall it should be vertically}
-*/
-MOVES := [Move]Attack_Data {
-	.Jab             = {startup = 4,  active = 3, recovery = 10, hitbox = {20, -60, 45, 25},    damage = 3},
-	.Side_Strong     = {startup = 15, active = 8, recovery = 25, hitbox = {20, -70, 70, 40},    damage = 14},
-	.Neutral_Special = {startup = 7,  active = 5, recovery = 17, hitbox = {25, -75, 60, 50},    damage = 8},
-	.Forward_Aerial  = {startup = 6,  active = 5, recovery = 12, hitbox = {25, -75, 90, 45},    damage = 7},
-	.Up_Aerial       = {startup = 5,  active = 5, recovery = 12, hitbox = {-35, -135, 70, 50},  damage = 6},
-	.Down_Aerial     = {startup = 5,  active = 5, recovery = 12, hitbox = {-35, -5, 70, 50},    damage = 8},
 }
 
 attack_total_frames :: proc(a: Attack_Data) -> int {
@@ -207,7 +167,8 @@ Fighter_State :: enum {
 }
 
 Fighter :: struct {
-	stats:       ^Fighter_Stats,
+	character:   ^Character_Data, // shared, loaded from data/characters/
+	rules:       ^Rules,          // shared, loaded from data/rules.json
 	pos:         Vec2, // feet, horizontally centred
 	vel:         Vec2,
 	facing:      f32,  // +1 right, -1 left
@@ -238,13 +199,23 @@ Fighter :: struct {
 	time_accum: f32,
 
 	prev_input: Input,
+
+	// Things that happened this tick, for the audio pass to play sounds.
+	// Cleared by play_fighter_sounds after it reads them.
+	events: bit_set[Fighter_Event],
 }
 
-fighter_make :: proc(stats: ^Fighter_Stats, spawn: Vec2, facing: f32) -> Fighter {
+Fighter_Event :: enum {
+	Jumped,
+	KO,
+}
+
+fighter_make :: proc(character: ^Character_Data, rules: ^Rules, spawn: Vec2, facing: f32) -> Fighter {
 	f := Fighter {
-		stats      = stats,
+		character  = character,
+		rules      = rules,
 		facing     = facing,
-		stocks     = STARTING_STOCKS,
+		stocks     = rules.starting_stocks,
 		time_scale = 1,
 	}
 	fighter_respawn(&f, spawn)
@@ -256,8 +227,8 @@ fighter_respawn :: proc(f: ^Fighter, spawn: Vec2) {
 	f.vel = {}
 	f.damage = 0
 	f.grounded = false
-	f.air_jumps_left = f.stats.max_air_jumps
-	f.air_dashes_left = f.stats.max_air_dashes
+	f.air_jumps_left = f.character.stats.max_air_jumps
+	f.air_dashes_left = f.character.stats.max_air_dashes
 	f.dash_cooldown = 0
 	f.tap_timer = 0
 	set_state(f, .Airborne)
@@ -281,7 +252,7 @@ fighter_update :: proc(f: ^Fighter, input: Input, stage: Stage) {
 
 // One frame of this fighter's own time.
 fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
-	s := f.stats
+	s := &f.character.stats
 	pressed := input - f.prev_input
 	f.prev_input = input
 	if f.dash_cooldown > 0 do f.dash_cooldown -= 1
@@ -299,7 +270,7 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 	if tap != 0 {
 		double_tapped = f.tap_timer > 0 && tap == f.tap_dir
 		f.tap_dir = tap
-		f.tap_timer = DOUBLE_TAP_WINDOW
+		f.tap_timer = f.rules.double_tap_window
 	}
 
 	switch f.state {
@@ -314,6 +285,7 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 			start_dash(f, input)
 		} else if .Jump in pressed {
 			f.vel.y = -s.jump_velocity
+			f.events += {.Jumped}
 			set_state(f, .Airborne)
 		} else if dir == 0 {
 			f.vel.x = 0
@@ -338,6 +310,7 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 			if .Jump in pressed && f.air_jumps_left > 0 {
 				f.air_jumps_left -= 1
 				f.vel.y = -s.double_jump_velocity
+				f.events += {.Jumped}
 			}
 			air_drift(f, dir)
 		}
@@ -354,7 +327,7 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 		// B-reverse: early in neutral special, holding the opposite
 		// direction turns you around and flips your horizontal momentum.
 		if f.move == .Neutral_Special && !f.b_reversed &&
-		   f.state_frame <= B_REVERSE_WINDOW && dir == -f.facing {
+		   f.state_frame <= f.rules.b_reverse_window && dir == -f.facing {
 			f.facing = -f.facing
 			f.vel.x = -f.vel.x
 			f.b_reversed = true
@@ -365,7 +338,7 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 		} else {
 			air_drift(f, dir)
 		}
-		if f.state_frame >= attack_total_frames(MOVES[f.move]) {
+		if f.state_frame >= attack_total_frames(f.character.moves[f.move]) {
 			set_state(f, .Idle if f.grounded else .Airborne)
 		}
 
@@ -402,7 +375,7 @@ dash_direction :: proc(f: ^Fighter, input: Input) -> Vec2 {
 
 start_dash :: proc(f: ^Fighter, input: Input) {
 	f.dash_dir = dash_direction(f, input)
-	f.vel = f.dash_dir * f.stats.dash_speed
+	f.vel = f.dash_dir * f.character.stats.dash_speed
 	set_state(f, .Dash)
 }
 
@@ -416,8 +389,8 @@ try_start_attack :: proc(f: ^Fighter, pressed, held: Input) -> bool {
 }
 
 air_drift :: proc(f: ^Fighter, dir: f32) {
-	target := dir * f.stats.air_speed
-	f.vel.x = move_toward(f.vel.x, target, f.stats.air_accel)
+	target := dir * f.character.stats.air_speed
+	f.vel.x = move_toward(f.vel.x, target, f.character.stats.air_accel)
 }
 
 move_toward :: proc(current, target, step: f32) -> f32 {
@@ -433,7 +406,7 @@ land_on_platforms :: proc(f: ^Fighter, stage: Stage, prev_feet_y: f32, drop_thro
 	f.grounded = false
 	if f.vel.y < 0 do return
 
-	half_w := f.stats.size.x / 2
+	half_w := f.character.stats.size.x / 2
 	for p in stage.platforms {
 		if p.soft && drop_through do continue
 
@@ -448,8 +421,8 @@ land_on_platforms :: proc(f: ^Fighter, stage: Stage, prev_feet_y: f32, drop_thro
 	}
 
 	if f.grounded && !was_grounded {
-		f.air_jumps_left = f.stats.max_air_jumps
-		f.air_dashes_left = f.stats.max_air_dashes
+		f.air_jumps_left = f.character.stats.max_air_jumps
+		f.air_dashes_left = f.character.stats.max_air_dashes
 		// Landing ends a jump or an aerial (landing lag comes later).
 		if f.state == .Airborne || (f.state == .Attack && is_aerial(f.move)) {
 			set_state(f, .Idle)
@@ -462,14 +435,14 @@ land_on_platforms :: proc(f: ^Fighter, stage: Stage, prev_feet_y: f32, drop_thro
 // ---------------------------------------------------------------------------
 
 fighter_body :: proc(f: Fighter) -> rl.Rectangle {
-	w, h := f.stats.size.x, f.stats.size.y
+	w, h := f.character.stats.size.x, f.character.stats.size.y
 	return {f.pos.x - w / 2, f.pos.y - h, w, h}
 }
 
 // The current hitbox in world space, if the attack is in its active frames.
 attack_hitbox :: proc(f: Fighter) -> (box: rl.Rectangle, active: bool) {
 	if f.state != .Attack do return {}, false
-	a := MOVES[f.move]
+	a := f.character.moves[f.move]
 	if f.state_frame < a.startup || f.state_frame >= a.startup + a.active {
 		return {}, false
 	}

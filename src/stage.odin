@@ -17,27 +17,34 @@ Stage :: struct {
 }
 
 // Level data. Moves to a data file in CP3.
-DEFAULT_PLATFORMS := [?]Platform {
-	{rect = {290, 520, 700, 200}, soft = false}, // main stage
-	{rect = {390, 380, 180, 12}, soft = true},
-	{rect = {710, 380, 180, 12}, soft = true},
-	{rect = {550, 250, 180, 12}, soft = true},
-}
+// DEFAULT_PLATFORMS := [?]Platform {
+// 	{rect = {290, 520, 700, 200}, soft = false}, // main stage
+// 	{rect = {390, 380, 180, 12}, soft = true},
+// 	{rect = {710, 380, 180, 12}, soft = true},
+// 	{rect = {550, 250, 180, 12}, soft = true},
+// }
 
-make_default_stage :: proc() -> Stage {
-	return Stage {
-		platforms  = DEFAULT_PLATFORMS[:],
-		blast_zone = {-300, -400, 1880, 1500},
-		spawns     = {{450, 520}, {830, 520}},
-	}
-}
+// make_default_stage :: proc() -> Stage {
+// 	return Stage {
+// 		platforms  = DEFAULT_PLATFORMS[:],
+// 		blast_zone = {-300, -400, 1880, 1500},
+// 		spawns     = {{450, 520}, {830, 520}},
+// 	}
+// }
 
 load_stage :: proc(path: string) -> (stage: Stage, ok: bool) {
-	// A. read the file
-	data, read_err := os.read_entire_file("data/stages/main.json", context.allocator)
-	// B. if reading failed: print an error and return
-	// C. make sure the file bytes get freed
-	// D. parse the JSON into `stage`
-	// E. if parsing failed: print an error and return
-	// F. success
+	data, read_err := os.read_entire_file(path, context.allocator)
+	if read_err != nil{
+		fmt.eprintln("Could not read", path, "-", read_err)
+		return
+	}
+	defer delete(data)
+	json_err := json.unmarshal(data, &stage)
+	if json_err != nil{
+		fmt.eprintln("Could not parse", path, "-", json_err)
+		return
+	}
+
+	ok = true
+	return
 }

@@ -1,0 +1,39 @@
+// Lucy: Stun opener.
+// Speeds are pixels per tick, gravity is pixels per tick^2, frame counts are ticks (60 per second).
+{
+	"display_name": "Lucy",
+
+	"stats": {
+		"size": [50, 90],
+		"walk_speed": 5,
+		"run_speed": 10,
+		"air_speed": 5.5,
+		"air_accel": 0.5,
+		"gravity": 0.6,
+		"max_fall_speed": 12,
+		"jump_velocity": 13,
+		"double_jump_velocity": 11,
+		"max_air_jumps": 1,
+		"dash_speed": 12,
+		"dash_frames": 10,
+		"dash_cooldown": 20,
+		"max_air_dashes": 1,
+	},
+
+	/*
+		For hitboxes:
+		{how far from origin point horizontally in direction of facing: (middle of body; the top left of hitbox starts from that point),
+		how high from bottom should the hitbox be (the hitbox extends downward: negative is higher),
+		how long the hitbox should be horizontally,
+		how tall it should be vertically}
+	*/
+	// opener: "None", "Stun" or "Slow". Knockback is not applied until collision week.
+	"moves": {
+		"Jab":             {"startup": 4,  "active": 3, "recovery": 10, "hitbox": {"x": 20,  "y": -60,  "width": 45, "height": 25}, "damage": 3,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
+		"Side_Strong":     {"startup": 15, "active": 8, "recovery": 25, "hitbox": {"x": 20,  "y": -70,  "width": 70, "height": 40}, "damage": 14, "base_knockback": 0, "knockback_growth": 0, "opener": "None"},
+		"Neutral_Special": {"startup": 7,  "active": 5, "recovery": 17, "hitbox": {"x": 25,  "y": -75,  "width": 60, "height": 50}, "damage": 8,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
+		"Forward_Aerial":  {"startup": 6,  "active": 5, "recovery": 12, "hitbox": {"x": 25,  "y": -75,  "width": 90, "height": 45}, "damage": 7,  "base_knockback": 0, "knockback_growth": 0, "opener": "None"},
+		"Up_Aerial":       {"startup": 5,  "active": 5, "recovery": 12, "hitbox": {"x": -35, "y": -135, "width": 70, "height": 50}, "damage": 6,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
+		"Down_Aerial":     {"startup": 5,  "active": 5, "recovery": 12, "hitbox": {"x": -35, "y": -5,   "width": 70, "height": 50}, "damage": 8,  "base_knockback": 0, "knockback_growth": 0, "opener": "None"},
+	},
+}

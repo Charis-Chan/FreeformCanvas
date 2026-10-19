@@ -15,11 +15,23 @@ main :: proc() {
 	rl.SetConfigFlags({.VSYNC_HINT})
 	rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Freeform Canvas")
 	defer rl.CloseWindow()
+	rl.InitAudioDevice()
+	defer rl.CloseAudioDevice()
 
-	game := game_init()
+	// Loaded once here, shared with render and the audio pass, unloaded once
+	// when main returns (defers run in reverse order: assets, audio, window).
+	assets, assets_ok := assets_load()
+	if !assets_ok do return
+	defer assets_unload(&assets)
+
+	// Data files. On failure the problem has been printed; quit rather than
+	// run with missing data.
+	game, game_ok := game_init()
+	if !game_ok do return
 
 	// Fixed-timestep loop:
 	//   pass 1 (update) runs 0..n times per screen frame, always in TICK_DT steps
+	//   audio pass plays sounds for what happened during those ticks
 	//   pass 2 (render) runs once per screen frame and only reads the game
 	accumulator: f32
 	for !rl.WindowShouldClose() {
@@ -31,8 +43,10 @@ main :: proc() {
 			accumulator -= TICK_DT
 		}
 
-		// `game` is passed by value: Odin parameters are read-only, so the
-		// compiler guarantees render cannot change the game state.
-		render(game)
+		play_fighter_sounds(&game, assets)
+
+		// `game` and `assets` are passed by value: Odin parameters are
+		// read-only, so the compiler guarantees render cannot change them.
+		render(game, assets)
 	}
 }
