@@ -28,6 +28,8 @@ Game :: struct {
 	rules:      Rules,
 	characters: [Character_Id]Character_Data,
 
+	show_boxes: bool, // F2: draw body boxes and hitboxes over the sprites
+
 	reload_message:      cstring,
 	reload_message_good: bool,
 	reload_message_left: int, // ticks until the message disappears
@@ -37,6 +39,7 @@ Game :: struct {
 	prev_confirm: bool,
 	prev_debug:   bool,
 	prev_reload:  bool,
+	prev_boxes:   bool,
 }
 
 // Loads all data files. Returns ok = false if any of them is missing or
@@ -55,6 +58,7 @@ game_init :: proc() -> (g: Game, ok: bool) {
 	g.stage = stage
 
 	g.state = .Title
+	g.show_boxes = true // on by default while collision is being built
 	g.bindings = {P1_BINDINGS, P2_BINDINGS}
 	return g, true
 }
@@ -107,6 +111,10 @@ game_update :: proc(g: ^Game) {
 	if reload && !g.prev_reload do reload_data(g)
 	g.prev_reload = reload
 	if g.reload_message_left > 0 do g.reload_message_left -= 1
+
+	boxes := rl.IsKeyDown(.F2)
+	if boxes && !g.prev_boxes do g.show_boxes = !g.show_boxes
+	g.prev_boxes = boxes
 
 	switch g.state {
 	case .Title:

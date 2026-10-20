@@ -9,6 +9,7 @@ BACKGROUND_COLOR    :: rl.Color{24, 24, 32, 255}
 PLATFORM_COLOR      :: rl.Color{90, 90, 110, 255}
 SOFT_PLATFORM_COLOR :: rl.Color{130, 130, 160, 255}
 HITBOX_COLOR        :: rl.Color{255, 60, 60, 140}
+BODY_BOX_COLOR      :: rl.Color{255, 255, 0, 160}
 
 PLAYER_COLORS := [2]rl.Color {
 	{230, 90, 80, 255},
@@ -64,7 +65,7 @@ draw_match :: proc(game: Game, assets: Assets) {
 	}
 
 	for f, i in game.fighters {
-		draw_fighter(f, PLAYER_COLORS[i], assets)
+		draw_fighter(f, PLAYER_COLORS[i], assets, game.show_boxes)
 	}
 
 	// HUD
@@ -77,23 +78,21 @@ draw_match :: proc(game: Game, assets: Assets) {
 			draw_text(assets, rl.TextFormat("SLOWED x%.2f", f.time_scale), x, 670, 18, rl.SKYBLUE)
 		}
 	}
-	draw_text_centered(assets, "F1: toggle Slow on P2   F5: reload data (debug)", 690, 18, rl.GRAY)
+	draw_text_centered(assets, "F1: Slow on P2   F2: show boxes   F5: reload data   (debug)", 690, 18, rl.GRAY)
 }
 
-draw_fighter :: proc(f: Fighter, color: rl.Color, assets: Assets) {
+draw_fighter :: proc(f: Fighter, color: rl.Color, assets: Assets, show_boxes: bool) {
 	body := fighter_body(f)
-	rl.DrawRectangleRec(body, color)
+	draw_sprite(assets.fighter_sprite, 0, f.pos, f.facing, color)
 
-	// Eye on the facing side, so facing is visible on a plain rectangle.
-	eye_x := body.x + body.width - 16 if f.facing > 0 else body.x + 6
-	rl.DrawRectangleRec({eye_x, body.y + 14, 10, 10}, rl.RAYWHITE)
-
+	if show_boxes {
+		rl.DrawRectangleLinesEx(body, 2, BODY_BOX_COLOR)
+		if box, active := attack_hitbox(f); active {
+			rl.DrawRectangleRec(box, HITBOX_COLOR)
+		}
+	}
 	if f.state == .Dash {
 		rl.DrawRectangleLinesEx(body, 3, rl.RAYWHITE)
-	}
-
-	if box, active := attack_hitbox(f); active {
-		rl.DrawRectangleRec(box, HITBOX_COLOR)
 	}
 
 	label := MOVE_LABELS[f.move] if f.state == .Attack else STATE_LABELS[f.state]
@@ -107,4 +106,17 @@ draw_text :: proc(assets: Assets, text: cstring, x, y, size: f32, color: rl.Colo
 draw_text_centered :: proc(assets: Assets, text: cstring, y, size: f32, color: rl.Color) {
 	width := rl.MeasureTextEx(assets.font, text, size, TEXT_SPACING).x
 	draw_text(assets, text, (SCREEN_WIDTH - width) / 2, y, size, color)
+}
+
+// Draws one frame of a sprite with its feet at `feet` (bottom-centre),
+// mirrored when the fighter faces the opposite way to the art.
+draw_sprite :: proc(s: Sprite, frame: i32, feet: Vec2, facing: f32, tint: rl.Color) {
+	fw, fh := sprite_frame_size(s)
+	source := rl.Rectangle{f32(frame) * fw, 0, fw, fh}
+	art_facing: f32 = 1 if s.faces_right else -1
+	if facing != art_facing do source.width = -fw // negative width = mirrored
+
+	w, h := fw * s.scale, fh * s.scale
+	dest := rl.Rectangle{feet.x - w / 2, feet.y - h, w, h}
+	rl.DrawTexturePro(s.texture, source, dest, {0, 0}, 0, tint)
 }

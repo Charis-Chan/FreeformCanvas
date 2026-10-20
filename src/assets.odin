@@ -23,9 +23,30 @@ SOUND_FILES := [Sound_Id]cstring {
 	.KO   = "assets/sounds/ko.ogg",
 }
 
+// A spritesheet: frames of equal size side by side in one row.
+// Draw it white/light grey so render can tint it per player.
+Sprite :: struct {
+	texture:     rl.Texture2D,
+	frame_count: i32,
+	faces_right: bool, // which way the art faces; mirrored when the fighter faces the other way
+	scale:       f32,  // art pixels -> screen pixels (whole numbers keep pixels sharp)
+}
+
+// Placeholder until the real character art exists (Task 5).
+FIGHTER_SPRITE_FILE :: "assets/sprites/placeholder/hero.png"
+FIGHTER_SPRITE_FRAMES :: 1
+FIGHTER_SPRITE_FACES_RIGHT :: true
+FIGHTER_SPRITE_SCALE :: 5
+
 Assets :: struct {
 	font:   rl.Font,
 	sounds: [Sound_Id]rl.Sound,
+	// One texture shared by both fighters; render tints it per player.
+	fighter_sprite: Sprite,
+}
+
+sprite_frame_size :: proc(s: Sprite) -> (w, h: f32) {
+	return f32(s.texture.width / s.frame_count), f32(s.texture.height)
 }
 
 // Needs the window and audio device to exist already.
@@ -35,6 +56,20 @@ assets_load :: proc() -> (a: Assets, ok: bool) {
 		fmt.eprintln("Could not load font", FONT_FILE)
 		assets_unload(&a)
 		return
+	}
+
+	tex := rl.LoadTexture(FIGHTER_SPRITE_FILE)
+	if !rl.IsTextureValid(tex) {
+		fmt.eprintln("Could not load sprite", FIGHTER_SPRITE_FILE)
+		assets_unload(&a)
+		return
+	}
+	rl.SetTextureFilter(tex, .POINT) // keep pixel art sharp when scaled up
+	a.fighter_sprite = Sprite {
+		texture     = tex,
+		frame_count = FIGHTER_SPRITE_FRAMES,
+		faces_right = FIGHTER_SPRITE_FACES_RIGHT,
+		scale       = FIGHTER_SPRITE_SCALE,
 	}
 
 	// No audio device (broken drivers, no speakers) is not fatal: the game
@@ -55,6 +90,7 @@ assets_load :: proc() -> (a: Assets, ok: bool) {
 }
 
 assets_unload :: proc(a: ^Assets) {
+	if rl.IsTextureValid(a.fighter_sprite.texture) do rl.UnloadTexture(a.fighter_sprite.texture)
 	for sound in a.sounds {
 		if rl.IsSoundValid(sound) do rl.UnloadSound(sound)
 	}
