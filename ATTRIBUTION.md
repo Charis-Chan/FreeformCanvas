@@ -44,6 +44,7 @@ None so far.
 | `src/stage.odin` → `load_stage` | typed by me from an AI-provided, line-by-line explained example |
 | `data/characters/david.json` | David's stats and Slow moves, my design |
 | `assets/sprites/placeholder/hero.png` | placeholder fighter sprite, drawn by me |
+| `assets/sprites/lucy/idle.png` | Lucy’s idle (2 frames), drawn by me. Character design is my own, inspired by Cyberpunk: Edgerunners (CD Projekt / Studio Trigger). Colours picked from cyberpunk palettes suggested by Claude Code (Anthropic) |
 
 ## Other
 

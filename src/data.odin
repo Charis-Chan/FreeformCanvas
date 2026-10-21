@@ -29,10 +29,20 @@ Rules :: struct {
 
 // One character file: name, movement stats and every move's data.
 Character_Data :: struct {
+	id:           Character_Id, // set by the loader, not read from the file
 	display_name: string,
 	stats:        Fighter_Stats,
 	moves:        [Move]Attack_Data,
+	animations:   [Anim]Anim_Timing, // optional in the file; missing ones use DEFAULT_TICKS_PER_FRAME
 }
+
+// How long each art frame stays on screen, in game ticks (60 per second).
+// Attacks ignore this: their frames follow startup / active / recovery.
+Anim_Timing :: struct {
+	ticks_per_frame: int,
+}
+
+DEFAULT_TICKS_PER_FRAME :: 8
 
 // Reads a JSON file into `out`. Prints a message naming the file on failure.
 load_json_file :: proc(path: string, out: ^$T) -> bool {
@@ -108,6 +118,7 @@ load_all_characters :: proc() -> (chars: [Character_Id]Character_Data, ok: bool)
 			for &already in chars do free_character(&already)
 			return
 		}
+		c.id = id
 		chars[id] = c
 	}
 	return chars, true

@@ -20,6 +20,13 @@
 		"max_air_dashes": 1,
 	},
 
+	// Art frame timing: how many ticks each art frame is shown (60 ticks = 1 second).
+	// Only looping animations use this; attacks follow their startup/active/recovery.
+	// Animations not listed here use 8.
+	"animations": {
+		"Idle": {"ticks_per_frame": 12},
+	},
+
 	/*
 		For hitboxes:
 		{how far from origin point horizontally in direction of facing: (middle of body; the top left of hitbox starts from that point),
@@ -30,7 +37,7 @@
 	// opener: "None", "Stun" or "Slow". Knockback is not applied until collision week.
 	"moves": {
 		"Jab":             {"startup": 4,  "active": 3, "recovery": 10, "hitbox": {"x": 20,  "y": -60,  "width": 45, "height": 25}, "damage": 3,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
-		"Side_Strong":     {"startup": 15, "active": 8, "recovery": 25, "hitbox": {"x": 20,  "y": -70,  "width": 70, "height": 40}, "damage": 14, "base_knockback": 0, "knockback_growth": 0, "opener": "None"},
+		"Side_Strong":     {"startup": 15, "active": 8, "recovery": 25, "hitbox": {"x": 20,  "y": -70,  "width": 70, "height": 40}, "damage": 14, "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
 		"Neutral_Special": {"startup": 7,  "active": 5, "recovery": 17, "hitbox": {"x": 25,  "y": -75,  "width": 60, "height": 50}, "damage": 8,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
 		"Forward_Aerial":  {"startup": 6,  "active": 5, "recovery": 12, "hitbox": {"x": 25,  "y": -75,  "width": 90, "height": 45}, "damage": 7,  "base_knockback": 0, "knockback_growth": 0, "opener": "None"},
 		"Up_Aerial":       {"startup": 5,  "active": 5, "recovery": 12, "hitbox": {"x": -35, "y": -135, "width": 70, "height": 50}, "damage": 6,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
