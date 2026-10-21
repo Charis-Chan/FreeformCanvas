@@ -39,7 +39,7 @@ hitbox can be shortened in data.
 
 - One PNG **per animation**, frames side by side in **one row**, left to right.
 - Exported at **1x** (the game scales it), no gaps or padding between frames.
-- Path: `assets/sprites/<character>/<animation>.png`, e.g. `assets/sprites/lucy/run.png`
+- Path: `assets/sprites/<character>/<character>_<animation>.png`, e.g. `assets/sprites/lucy/lucy_run.png`
 - Lucy and David each get their own folder. Draw in full colour.
 - Frame timing (how many game ticks each frame shows) goes in the character
   data file, not the art, so it can be tuned with F5.
