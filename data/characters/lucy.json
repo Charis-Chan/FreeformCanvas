@@ -4,7 +4,7 @@
 	"display_name": "Lucy",
 
 	"stats": {
-		"size": [50, 90],
+		"size": [48, 90],
 		"walk_speed": 5,
 		"run_speed": 10,
 		"air_speed": 5.5,

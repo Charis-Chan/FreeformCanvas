@@ -21,7 +21,7 @@ size or palette.
 |---|---|---|
 | Frame size | **64 x 64** px | Fits every current move: up aerial reaches 45 art px above the feet, down aerial 15 below |
 | In-game scale | **3x** (each art pixel = 3x3 screen pixels) | Character ~30 px tall = fewer pixels to draw per frame |
-| Character size (idle) | about **16 wide x 30 tall** art px | Matches the 50 x 90 body box (hurtbox) / 3 (16.7 rounded down so it centres on the canvas) |
+| Character size (idle) | about **16 wide x 30 tall** art px | Matches the 48 x 90 body box (hurtbox) / 3 |
 | Feet line | lowest foot pixel on **row 51** (rows counted 0 at the top) | Leaves rows 52-63 for down-aerial legs and effects |
 | Horizontal centre | between **columns 31 and 32** (columns counted 0 at the left) | Body box: columns 24-39, rows 22-51: 8 columns each side of the centre, so mirroring for left-facing doesn't shift the body |
 | Facing | **right** | Code mirrors it for left |

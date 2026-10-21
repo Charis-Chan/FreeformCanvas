@@ -19,6 +19,7 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 | Movement | Reverse aerial rush: jumping during a run-turnaround keeps the old momentum but uses the new facing |
 | Attacks (per character) | Jab, side strong, forward aerial, up aerial, down aerial, neutral special (with B-reverse) |
 | Combat | Damage %, knockback that scales with damage, blast zones, stocks |
+| Combat | Hurtbox: one box per fighter (48 x 90, `size` in character data), not shaped to the art |
 | Combo openers | Stun (with stun decay + cooldown), Slow (timer + cooldown) |
 | Cancels | Attack → attack, attack → dash |
 | Anti-infinite | Combo scaling (decreased hitstun for consecutive hits, providing an end to combos) + attack decay (using same attack repeatedly within a short window has decreased damage) |
@@ -32,6 +33,7 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 | Feature |
 |---|
 | Hitstop, screenshake, hit sounds |
+| Hurtbox size per state (e.g. shorter in jump squat), only if playtesting shows the single box feels wrong |
 | Controller support |
 | Pause menu |
 | Character select screen |
@@ -51,6 +53,7 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 | Attacks | Up strong, down strong |
 | Attacks | Neutral aerial, back aerial |
 | Attacks | Dash attack |
+| Combat | Per-move hurtbox changes (e.g. an extended limb can be hit during a slow attack's startup) |
 
 ## Controls
 
@@ -72,3 +75,4 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 - Oct 6: Down aerial moved Stretch → Core (already implemented; covers below for edge-guarding). Back aerial added to Stretch.
 - Oct 6: No turning in the air; air dash follows the held direction. B-reverse on neutral special added to Core (moves that knock the opponent behind you need a way to turn around mid-air to extend combos).
 - Oct 19: Added run-turnaround, dash dancing, jump squat + short hop, and reverse aerial rush to Core. Nothing removed: judged essential to movement feel (short hops are needed for aerial combos; with air facing locked, ground facing before a jump decides every aerial). Frame counts live in character data. Built after collision (Oct 26).
+- Oct 21: Hurtboxes stay boxes, not shaped to the sprites (pixel shapes feel unfair, tie balance to the art and cost days). One 48 x 90 box per fighter in Core; per-state sizes in Polish if playtesting needs it; per-move hurtboxes in Stretch.

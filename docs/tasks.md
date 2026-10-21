@@ -9,7 +9,7 @@ files (not literals), attribution complete.
 | 2 | Me | `load_stage` in `src/stage.odin` | Done (typed from explained example) |
 | 3 | Me | `data/characters/lucy.json` and `david.json`, incl. which moves stun/slow | Done |
 | 4 | Me | Find sounds + a font (CC0/OFL), add attribution rows | Done |
-| 5 | Me | Sprite pipeline decisions + Lucy's idle animation (timed) | Not started |
+| 5 | Me | Sprite pipeline decisions + Lucy's idle animation (timed) | In progress, idle done |
 | 6 | Claude | Character loader + `data/rules.json` loader | Done, handed over |
 | 7 | Claude | F5 reload of data files | Done, handed over |
 | 8 | Claude | `Assets` struct: load once, share, unload once (font + sounds) | Done, handed over |

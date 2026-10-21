@@ -4,7 +4,7 @@
 	"display_name": "David",
 
 	"stats": {
-		"size": [50, 90],
+		"size": [48, 90],
 		"walk_speed": 3.5,
 		"run_speed": 6,
 		"air_speed": 3.5,
