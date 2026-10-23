@@ -46,6 +46,8 @@ None so far.
 | `data/characters/david.json` | David's stats and Slow moves, my design |
 | `assets/sprites/placeholder/hero.png` | placeholder fighter sprite, drawn by me |
 | `assets/sprites/lucy/lucy_idle.png` | Lucy’s idle (2 frames), drawn by me. Character design is my own, inspired by Cyberpunk: Edgerunners (CD Projekt / Studio Trigger). Colours picked from cyberpunk palettes suggested by Claude Code (Anthropic) |
+| `assets/sprites/lucy/lucy_walk.png` | Lucy’s walk (2 frames), drawn by me |
+| `assets/sprites/lucy/lucy_run.png` | Lucy’s run (4 frames), drawn by me. Run style inspired by “Stickman Naruto Run Animation drawing practice #ninjarun” by ALKDR Animations, https://youtu.be/gFIHhML5BPA |
 
 ## Other
 

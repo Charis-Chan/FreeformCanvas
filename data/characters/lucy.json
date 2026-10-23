@@ -25,6 +25,8 @@
 	// Animations not listed here use 8.
 	"animations": {
 		"Idle": {"ticks_per_frame": 12},
+		"Walk": {"ticks_per_frame": 10},
+		"Run": {"ticks_per_frame": 6},
 	},
 
 	/*
