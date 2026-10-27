@@ -25,6 +25,8 @@ Rules :: struct {
 	starting_stocks:   int,
 	double_tap_window: int, // ticks between two taps of a direction to start a run
 	b_reverse_window:  int, // ticks after neutral special in which B-reverse works
+	hitstun_per_knockback: f32,
+	knockback_friction: f32,
 }
 
 // One character file: name, movement stats and every move's data.
@@ -80,6 +82,10 @@ load_rules :: proc(path: string) -> (rules: Rules, ok: bool) {
 	if !load_json_file(path, &rules) do return
 	if rules.starting_stocks < 1 {
 		fmt.eprintln(path, "- starting_stocks must be at least 1")
+		return
+	}
+	if rules.hitstun_per_knockback <= 0 || rules.knockback_friction <= 0{
+		fmt.eprintln(path, "- hitstun_per_knockback and knockback must be above 0 (misspelled key?)")
 		return
 	}
 	return rules, true

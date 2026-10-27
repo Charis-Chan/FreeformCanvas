@@ -37,12 +37,74 @@
 		how tall it should be vertically}
 	*/
 	// opener: "None", "Stun" or "Slow". Knockback is not applied until collision week.
+	// Knockback = base_knockback + knockback_growth x (victim's damage / 100), in pixels per tick.
+	// angle: launch direction in degrees. 0 = straight forward, 45 = up and forward, 90 = straight up, -90 = straight down.
 	"moves": {
-		"Jab":             {"startup": 4,  "active": 3, "recovery": 10, "hitbox": {"x": 20,  "y": -60,  "width": 45, "height": 25}, "damage": 3,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
-		"Side_Strong":     {"startup": 15, "active": 8, "recovery": 25, "hitbox": {"x": 20,  "y": -70,  "width": 70, "height": 40}, "damage": 14, "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
-		"Neutral_Special": {"startup": 7,  "active": 5, "recovery": 17, "hitbox": {"x": 25,  "y": -75,  "width": 60, "height": 50}, "damage": 8,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
-		"Forward_Aerial":  {"startup": 6,  "active": 5, "recovery": 12, "hitbox": {"x": 25,  "y": -75,  "width": 90, "height": 45}, "damage": 7,  "base_knockback": 0, "knockback_growth": 0, "opener": "None"},
-		"Up_Aerial":       {"startup": 5,  "active": 5, "recovery": 12, "hitbox": {"x": -35, "y": -135, "width": 70, "height": 50}, "damage": 6,  "base_knockback": 0, "knockback_growth": 0, "opener": "Stun"},
-		"Down_Aerial":     {"startup": 5,  "active": 5, "recovery": 12, "hitbox": {"x": -35, "y": -5,   "width": 70, "height": 50}, "damage": 8,  "base_knockback": 0, "knockback_growth": 0, "opener": "None"},
+		"Jab":{
+			"startup": 4,
+			"active": 3,
+			"recovery": 10,
+			"hitbox": {"x": 20,  "y": -60,  "width": 45, "height": 25},
+			"damage": 3,
+			"base_knockback": 3,
+			"knockback_growth": 3,
+			"angle": 30,
+			"opener": "Stun"
+		},
+		"Side_Strong":{
+			"startup": 15,
+			"active": 8,
+			"recovery": 25,
+			"hitbox": {"x": 20,  "y": -70,  "width": 70, "height": 40},
+			"damage": 14,
+			"base_knockback": 7,
+			"knockback_growth": 16,
+			"angle": 40,
+			"opener": "Stun"
+		},
+		"Neutral_Special":{
+			"startup": 7, 
+			"active": 5,
+			"recovery": 17,
+			"hitbox": {"x": 25,  "y": -75,  "width": 60, "height": 50},
+			"damage": 8, 
+			"base_knockback": 5,
+			"knockback_growth": 8,
+			"angle": 45,
+			"opener": "Stun"
+		},
+		"Forward_Aerial":{
+			"startup": 6, 
+			"active": 5,
+			"recovery": 12,
+			"hitbox": {"x": 25,  "y": -75,  "width": 90, "height": 45},
+			"damage": 7, 
+			"base_knockback": 5,
+			"knockback_growth": 10,
+			"angle": 45,
+			"opener": "None"
+		},
+		"Up_Aerial":{
+			"startup": 5, 
+			"active": 5,
+			"recovery": 12,
+			"hitbox": {"x": -35, "y": -135, "width": 70, "height": 50},
+			"damage": 6, 
+			"base_knockback": 6,
+			"knockback_growth": 9,
+			"angle": 90,
+			"opener": "Stun"
+		},
+		"Down_Aerial":{
+			"startup": 5, 
+			"active": 5,
+			"recovery": 12,
+			"hitbox": {"x": -35, "y": -5,   "width": 70, "height": 50},
+			"damage": 8, 
+			"base_knockback": 4,
+			"knockback_growth": 10,
+			"angle": -80,
+			"opener": "None"
+		},
 	},
 }

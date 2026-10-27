@@ -149,4 +149,6 @@ match_update :: proc(g: ^Game) {
 			fighter_respawn(&f, g.stage.spawns[i])
 		}
 	}
+
+	resolve_hits(g)
 }

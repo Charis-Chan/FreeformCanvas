@@ -2,4 +2,6 @@
 	"starting_stocks": 3,
 	"double_tap_window": 12, // ticks between two taps of a direction to start a run
 	"b_reverse_window": 5,   // ticks after neutral special in which B-reverse works
+	"hitstun_per_knockback": 2.5,
+	"knockback_friction": 0.2,
 }

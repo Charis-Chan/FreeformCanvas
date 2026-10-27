@@ -23,6 +23,12 @@ SOUND_FILES := [Sound_Id]cstring {
 	.KO   = "assets/sounds/ko.ogg",
 }
 
+SOUND_VOLUMES := [Sound_Id]f32 {
+	.Jump = 1,
+	.Hit  = 0.5,
+	.KO   = 0.75,
+}
+
 // A spritesheet: frames of equal size side by side in one row.
 // Draw it white/light grey so render can tint it per player.
 Sprite :: struct {
@@ -161,6 +167,7 @@ assets_load :: proc() -> (a: Assets, ok: bool) {
 			assets_unload(&a)
 			return
 		}
+		rl.SetSoundVolume(a.sounds[id], SOUND_VOLUMES[id])
 	}
 	return a, true
 }
@@ -208,6 +215,7 @@ assets_unload :: proc(a: ^Assets) {
 play_fighter_sounds :: proc(game: ^Game, assets: Assets) {
 	for &f in game.fighters {
 		if .Jumped in f.events do play_sound(assets, .Jump)
+		if .Hit in f.events do play_sound(assets, .Hit)
 		if .KO in f.events do play_sound(assets, .KO)
 		f.events = {}
 	}

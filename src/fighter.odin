@@ -104,7 +104,7 @@ Opener :: enum {
 // One attack. Frame counts are in ticks. The hitbox is relative to the
 // fighter's feet while facing right; it is mirrored when facing left
 // (see the hitbox explanation in data/characters/lucy.json).
-// Damage/knockback/opener are not applied yet (collision week, Oct 26).
+// Openers are not applied on hit yet.
 Attack_Data :: struct {
 	startup:          int,
 	active:           int,
@@ -113,6 +113,7 @@ Attack_Data :: struct {
 	damage:           f32,
 	base_knockback:   f32,
 	knockback_growth: f32,
+	angle:			  f32,
 	opener:           Opener,
 }
 
@@ -163,7 +164,7 @@ Fighter_State :: enum {
 	Airborne,
 	Dash,    // ground dash and air dash
 	Attack,  // which one is in `move`
-	Hitstun, // not used until collision week
+	Hitstun, // knocked back, can't act until hitstun_left runs out
 }
 
 Fighter :: struct {
@@ -187,6 +188,8 @@ Fighter :: struct {
 	tap_timer: int, // ticks left to tap the same direction again
 
 	b_reversed: bool, // already B-reversed during the current attack
+	hit_landed: bool,
+	hitstun_left: int,
 
 
 	damage: f32,
@@ -207,6 +210,7 @@ Fighter :: struct {
 
 Fighter_Event :: enum {
 	Jumped,
+	Hit,
 	KO,
 }
 
@@ -343,6 +347,11 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 		}
 
 	case .Hitstun:
+		f.vel.x = move_toward(f.vel.x, 0, f.rules.knockback_friction)
+		f.hitstun_left -= 1
+		if f.hitstun_left <= 0{
+			set_state(f, .Idle if f.grounded else .Airborne)
+		}
 	}
 
 	// Physics. Dashes ignore gravity for their duration.
@@ -384,6 +393,7 @@ try_start_attack :: proc(f: ^Fighter, pressed, held: Input) -> bool {
 	if !ok do return false
 	f.move = move
 	f.b_reversed = false
+	f.hit_landed = false
 	set_state(f, .Attack)
 	return true
 }
