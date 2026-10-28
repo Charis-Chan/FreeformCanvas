@@ -36,7 +36,7 @@
 		how long the hitbox should be horizontally,
 		how tall it should be vertically}
 	*/
-	// opener: "None", "Stun" or "Slow". Knockback is not applied until collision week.
+	// opener: "None", "Stun" or "Slow" (not applied on hit yet)
 	// Knockback = base_knockback + knockback_growth x (victim's damage / 100), in pixels per tick.
 	// angle: launch direction in degrees. 0 = straight forward, 45 = up and forward, 90 = straight up, -90 = straight down.
 	"moves": {

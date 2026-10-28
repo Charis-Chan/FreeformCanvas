@@ -50,6 +50,9 @@ None so far.
 | `assets/sprites/lucy/lucy_idle.png` | Lucy’s idle (2 frames), drawn by me. Character design is my own, inspired by Cyberpunk: Edgerunners (CD Projekt / Studio Trigger). Colours picked from cyberpunk palettes suggested by Claude Code (Anthropic) |
 | `assets/sprites/lucy/lucy_walk.png` | Lucy’s walk (2 frames), drawn by me |
 | `assets/sprites/lucy/lucy_run.png` | Lucy’s run (4 frames), drawn by me. Run style inspired by “Stickman Naruto Run Animation drawing practice #ninjarun” by ALKDR Animations, https://youtu.be/gFIHhML5BPA |
+| `assets/sprites/lucy/lucy_jump_squat.png` | Lucy’s jump squat / landing (1 frame), drawn by me |
+| `assets/sprites/lucy/lucy_jump_rise.png` | Lucy’s jump rise (1 frame), drawn by me |
+| `assets/sprites/lucy/lucy_jump_fall.png` | Lucy’s jump fall (1 frame), drawn by me |
 
 ## Other
 

@@ -13,7 +13,7 @@ FONT_LOAD_SIZE :: 64 // pixel size the font is rasterised at; drawn smaller look
 
 Sound_Id :: enum {
 	Jump,
-	Hit, // played once hits exist (collision week)
+	Hit,
 	KO,
 }
 
