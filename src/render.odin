@@ -54,6 +54,19 @@ MOVE_ANIMS := [Move]Anim {
 	.Down_Aerial     = .Down_Aerial,
 }
 
+MODE_LABELS := [Game_Mode]cstring {
+	.Vs_Cpu = "VS CPU",
+	.Versus = "VERSUS",
+}
+
+CPU_STATE_LABELS := [Cpu_State]cstring {
+	.Approach = "APPROACH",
+	.Attack   = "ATTACK",
+	.Retreat  = "RETREAT",
+	.Recover  = "RECOVER",
+	.Hitstun  = "HITSTUN",
+}
+
 TEXT_SPACING :: 1
 
 render :: proc(game: Game, assets: Assets) {
@@ -64,11 +77,22 @@ render :: proc(game: Game, assets: Assets) {
 	switch game.state {
 	case .Title:
 		draw_text_centered(assets, "FREEFORM CANVAS", 240, 72, rl.RAYWHITE)
-		draw_text_centered(assets, "Press ENTER to start", 360, 28, rl.RAYWHITE)
+		for mode in Game_Mode {
+			label := MODE_LABELS[mode]
+			y := 360 + f32(int(mode)) * 44
+			if mode == game.mode {
+				draw_text_centered(assets, rl.TextFormat("> %s <", label), y, 32, PLAYER_COLORS[0])
+			} else {
+				draw_text_centered(assets, label, y, 32, rl.RAYWHITE)
+			}
+		}
+		draw_text_centered(assets, "W/S to choose, ENTER to start", 470, 20, rl.RAYWHITE)
 	case .Match:
 		draw_match(game, assets)
 	case .Results:
-		draw_text_centered(assets, rl.TextFormat("PLAYER %d WINS", game.winner + 1), 260, 64, PLAYER_COLORS[game.winner])
+		winner := rl.TextFormat("PLAYER %d WINS", game.winner + 1)
+		if game.mode == .Vs_Cpu && game.winner == 1 do winner = "CPU WINS"
+		draw_text_centered(assets, winner, 260, 64, PLAYER_COLORS[game.winner])
 		draw_text_centered(assets, "Press ENTER to return to title", 360, 28, rl.RAYWHITE)
 	}
 
@@ -101,11 +125,21 @@ draw_match :: proc(game: Game, assets: Assets) {
 		draw_fighter(f, i, assets, game.show_boxes)
 	}
 
+	// The CPU's current state above its tag, for showing the state machine
+	// working (on with the F2 debug boxes).
+	if game.mode == .Vs_Cpu && game.show_boxes {
+		f := game.fighters[1]
+		label := rl.TextFormat("CPU: %s", CPU_STATE_LABELS[game.cpu.state])
+		width := rl.MeasureTextEx(assets.font, label, 18, TEXT_SPACING).x
+		draw_text(assets, label, f.pos.x - width / 2, fighter_body(f).y - 52, 18, rl.YELLOW)
+	}
+
 	// HUD, on dark panels so it reads on the grey background.
 	for f, i in game.fighters {
 		x := f32(40 + i * 900)
 		rl.DrawRectangleRec({x - 12, 592, 300, 110}, HUD_PANEL_COLOR)
 		name := rl.TextFormat("P%d %s", i + 1, f.character.display_name)
+		if i == 1 && game.mode == .Vs_Cpu do name = rl.TextFormat("CPU %s", f.character.display_name)
 		draw_text(assets, name, x, 600, 30, PLAYER_COLORS[i])
 		draw_text(assets, rl.TextFormat("%.0f%%   stocks: %d", f.damage, f.stocks), x, 640, 22, rl.RAYWHITE)
 		if f.time_scale != 1 {

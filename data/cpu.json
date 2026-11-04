@@ -1,0 +1,8 @@
+// CPU opponent tuning. Ticks are 1/60 s. Press F5 to reload while playing.
+{
+	"reaction_ticks": 12,  // how late it sees what you do (12 = 0.2 s). Lower = harder
+	"attack_range": 90,    // horizontal distance at which it starts an attack
+	"aggression": 0.6,     // 0..1: chance to keep attacking instead of backing off after an attack
+	"retreat_ticks": 30,   // how long it backs off for
+	"dash_distance": 300,  // dashes toward you when farther than this
+}

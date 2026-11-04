@@ -6,7 +6,7 @@
         { "rect": {"x": 550, "y": 250, "width": 180, "height": 12}, "soft": true}
     ],
 
-    "blast_zone": {"x": -300, "y": -400, "width": 1880, "height": 1500},
+    "blast_zone": {"x": -300, "y": -200, "width": 1880, "height": 1500},
 
     "spawns": [[450, 520], [830, 520]]
 }

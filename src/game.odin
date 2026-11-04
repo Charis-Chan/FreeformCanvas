@@ -9,6 +9,12 @@ Game_State :: enum {
 	Results,
 }
 
+// Chosen on the title screen.
+Game_Mode :: enum {
+	Vs_Cpu, // player 2 is the CPU
+	Versus, // two players on one keyboard
+}
+
 // Which character each player uses (character select screen comes later).
 PLAYER_CHARACTERS := [2]Character_Id{.Lucy, .David}
 
@@ -22,11 +28,14 @@ Game :: struct {
 	fighters: [2]Fighter,
 	bindings: [2]Key_Bindings,
 	winner:   int, // index into fighters, valid in .Results
+	mode:     Game_Mode,
+	cpu:      Cpu, // drives player 2 in .Vs_Cpu
 
 	// Loaded from data/ once at startup, replaced in place by F5.
 	// Fighters point at these, so they always see the latest values.
 	rules:      Rules,
 	characters: [Character_Id]Character_Data,
+	cpu_config: Cpu_Config,
 
 	show_boxes: bool, // F2: draw body boxes and hitboxes over the sprites
 
@@ -40,6 +49,7 @@ Game :: struct {
 	prev_debug:   bool,
 	prev_reload:  bool,
 	prev_boxes:   bool,
+	prev_menu:    bool, // up/down on the title screen
 }
 
 // Loads all data files. Returns ok = false if any of them is missing or
@@ -57,6 +67,10 @@ game_init :: proc() -> (g: Game, ok: bool) {
 	if !stage_ok do return
 	g.stage = stage
 
+	cpu_config, cpu_ok := load_cpu_config(CPU_FILE)
+	if !cpu_ok do return
+	g.cpu_config = cpu_config
+
 	g.state = .Title
 	g.show_boxes = true // on by default while collision is being built
 	g.bindings = {P1_BINDINGS, P2_BINDINGS}
@@ -69,6 +83,7 @@ start_match :: proc(g: ^Game) {
 		facing: f32 = 1 if i == 0 else -1
 		g.fighters[i] = fighter_make(character, &g.rules, g.stage.spawns[i], facing)
 	}
+	g.cpu = {}
 	g.state = .Match
 }
 
@@ -78,7 +93,8 @@ reload_data :: proc(g: ^Game) {
 	rules, rules_ok := load_rules(RULES_FILE)
 	characters, chars_ok := load_all_characters()
 	stage, stage_ok := load_stage(STAGE_FILE)
-	if !rules_ok || !chars_ok || !stage_ok {
+	cpu_config, cpu_ok := load_cpu_config(CPU_FILE)
+	if !rules_ok || !chars_ok || !stage_ok || !cpu_ok {
 		if chars_ok do for &c in characters do free_character(&c)
 		if stage_ok do delete(stage.platforms)
 		show_reload_message(g, "Reload FAILED - see console, kept old data", false)
@@ -91,6 +107,7 @@ reload_data :: proc(g: ^Game) {
 	g.characters = characters
 	delete(g.stage.platforms)
 	g.stage = stage
+	g.cpu_config = cpu_config
 	show_reload_message(g, "Data reloaded", true)
 	fmt.println("Reloaded data files")
 }
@@ -118,6 +135,10 @@ game_update :: proc(g: ^Game) {
 
 	switch g.state {
 	case .Title:
+		// Up/down (W/S or arrows) switches between the two modes.
+		menu := rl.IsKeyDown(.W) || rl.IsKeyDown(.S) || rl.IsKeyDown(.UP) || rl.IsKeyDown(.DOWN)
+		if menu && !g.prev_menu do g.mode = .Versus if g.mode == .Vs_Cpu else .Vs_Cpu
+		g.prev_menu = menu
 		if confirm_pressed do start_match(g)
 	case .Match:
 		match_update(g)
@@ -136,7 +157,11 @@ match_update :: proc(g: ^Game) {
 	g.prev_debug = debug
 
 	for &f, i in g.fighters {
-		fighter_update(&f, read_input(g.bindings[i]), g.stage)
+		input := read_input(g.bindings[i])
+		if i == 1 && g.mode == .Vs_Cpu {
+			input = cpu_update(&g.cpu, f, g.fighters[0], g.stage, g.cpu_config)
+		}
+		fighter_update(&f, input, g.stage)
 
 		if !rl.CheckCollisionPointRec(f.pos, g.stage.blast_zone) {
 			f.stocks -= 1

@@ -19,6 +19,7 @@ Button :: enum {
 // The set of buttons held this tick. A fighter only ever sees this, never the
 // keyboard, so a CPU opponent (CP4) can drive a fighter by filling one in.
 Input :: bit_set[Button]
+DIRECTIONS :: Input{.Left, .Right, .Up, .Down}
 
 Key_Bindings :: [Button]rl.KeyboardKey
 
@@ -202,6 +203,10 @@ Fighter :: struct {
 	time_accum: f32,
 
 	prev_input: Input,
+	// Every button (not direction) held on any tick since the last step. A
+	// slowed fighter skips ticks, so a quick press on a skipped tick would
+	// otherwise be lost.
+	held_since_step: Input,
 
 	// Things that happened this tick, for the audio pass to play sounds.
 	// Cleared by play_fighter_sounds after it reads them.
@@ -247,12 +252,17 @@ set_state :: proc(f: ^Fighter, state: Fighter_State) {
 
 // Called once per game tick. Runs 0, 1 or more steps depending on time_scale.
 fighter_update :: proc(f: ^Fighter, input: Input, stage: Stage) {
+	f.held_since_step += input - DIRECTIONS
 	f.time_accum += f.time_scale
 	for f.time_accum >= 1 {
 		f.time_accum -= 1
-		fighter_step(f, input, stage)
+		// Buttons: anything pressed since the last step. Directions: only
+		// what's held now (Left then Right would otherwise cancel out).
+		fighter_step(f, f.held_since_step + input & DIRECTIONS, stage)
+		f.held_since_step = {}
 	}
 }
+
 
 // One frame of this fighter's own time.
 fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {

@@ -9,6 +9,7 @@ import "core:os"
 // comments and trailing commas are allowed.
 
 RULES_FILE :: "data/rules.json"
+CPU_FILE :: "data/cpu.json"
 
 Character_Id :: enum {
 	Lucy,  // Stun opener
@@ -89,6 +90,19 @@ load_rules :: proc(path: string) -> (rules: Rules, ok: bool) {
 		return
 	}
 	return rules, true
+}
+
+load_cpu_config :: proc(path: string) -> (c: Cpu_Config, ok: bool) {
+	if !load_json_file(path, &c) do return
+	if c.reaction_ticks < 0 || c.reaction_ticks > MAX_REACTION_TICKS {
+		fmt.eprintln(path, "- reaction_ticks must be between 0 and", MAX_REACTION_TICKS)
+		return
+	}
+	if c.attack_range <= 0 || c.aggression < 0 || c.aggression > 1 {
+		fmt.eprintln(path, "- attack_range must be above 0 and aggression between 0 and 1 (misspelled key?)")
+		return
+	}
+	return c, true
 }
 
 load_character :: proc(path: string) -> (c: Character_Data, ok: bool) {
