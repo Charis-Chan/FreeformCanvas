@@ -39,6 +39,9 @@ screen. **Esc** closes the game.
 - **Walk:** hold left or right.
 - **Run:** tap left or right twice quickly, then hold.
 - **Jump:** one jump from the ground, plus one double jump in the air.
+- **Double jump to recover:** holding left or right as you double jump sends
+  you that way at full speed straight away. Use it (and your air dash) to get
+  back to the stage after being knocked off.
 - **Drop through a platform:** hold down while standing on one of the thin
   platforms. The big main platform is solid.
 - **Dash:** dashes in the direction you're holding, or the way you're facing

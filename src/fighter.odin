@@ -349,6 +349,9 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 			if .Jump in pressed && f.air_jumps_left > 0 {
 				f.air_jumps_left -= 1
 				f.vel.y = -s.double_jump_velocity
+				// Holding a direction redirects you at full air speed, so a
+				// double jump can turn a launch around (a recovery tool).
+				if dir != 0 do f.vel.x = dir * s.air_speed
 				f.events += {.Jumped}
 			}
 			air_drift(f, dir)
