@@ -4,4 +4,15 @@
 	"b_reverse_window": 5,   // ticks after neutral special in which B-reverse works
 	"hitstun_per_knockback": 2.5,
 	"knockback_friction": 0.2,
+
+	// Stun (Lucy's opener). 60 ticks = 1 second.
+	"stun_ticks": 60,          // how long a stun hit freezes the victim
+	"stun_max_per_combo": 5,   // stun hits allowed in one combo
+	"stun_cooldown_ticks": 60, // after the last allowed stun, how long until stun works again
+	"combo_reset_ticks": 30,   // a combo ends once the victim has been free this long
+
+	// Slow (David's opener)
+	"slow_scale": 0.5,          // victim's speed while slowed (0.5 = half speed)
+	"slow_ticks": 300,          // how long Slow lasts (5 s)
+	"slow_cooldown_ticks": 180, // after Slow ends, how long until it can be applied again (3 s)
 }

@@ -28,6 +28,17 @@ Rules :: struct {
 	b_reverse_window:  int, // ticks after neutral special in which B-reverse works
 	hitstun_per_knockback: f32,
 	knockback_friction: f32,
+
+	// Stun (Lucy's opener)
+	stun_ticks:          int, // how long a stun hit freezes the victim
+	stun_max_per_combo:  int, // stun hits allowed in one combo
+	stun_cooldown_ticks: int, // after the last allowed stun, how long until stun works again
+	combo_reset_ticks:   int, // a combo ends after the victim is free this long
+
+	// Slow (David's opener)
+	slow_scale:          f32, // victim's speed while slowed (0.5 = half speed)
+	slow_ticks:          int, // how long Slow lasts
+	slow_cooldown_ticks: int, // after Slow ends, how long until it can be applied again
 }
 
 // One character file: name, movement stats and every move's data.
@@ -87,6 +98,14 @@ load_rules :: proc(path: string) -> (rules: Rules, ok: bool) {
 	}
 	if rules.hitstun_per_knockback <= 0 || rules.knockback_friction <= 0{
 		fmt.eprintln(path, "- hitstun_per_knockback and knockback must be above 0 (misspelled key?)")
+		return
+	}
+	if rules.stun_ticks <= 0 || rules.stun_max_per_combo <= 0 || rules.combo_reset_ticks <= 0 || rules.slow_ticks <= 0 {
+		fmt.eprintln(path, "- stun_ticks, stun_max_per_combo, combo_reset_ticks and slow_ticks must be above 0 (misspelled key?)")
+		return
+	}
+	if rules.slow_scale <= 0 || rules.slow_scale > 1 {
+		fmt.eprintln(path, "- slow_scale must be above 0 and at most 1 (misspelled key?)")
 		return
 	}
 	return rules, true

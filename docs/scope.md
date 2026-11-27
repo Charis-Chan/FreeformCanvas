@@ -17,6 +17,7 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 | Movement | Dash dancing: reversing in the first few frames of a run has no skid (window length is data; tuned by playtest) |
 | Movement | Jump squat (a few frames before leaving the ground) + short hop (jump released during jump squat) vs full hop (held) |
 | Movement | Reverse aerial rush: jumping during a run-turnaround keeps the old momentum but uses the new facing |
+| Movement | Landing lag: a few frames you can't act after landing; longer when landing during an aerial (per move, in data). Shows the jump squat pose |
 | Attacks (per character) | Jab, side strong, forward aerial, up aerial, down aerial, neutral special (with B-reverse) |
 | Combat | Damage %, knockback that scales with damage, blast zones, stocks |
 | Combat | Ground bounce: a fighter spiked into the ground or a platform while still in hitstun bounces up once per move (two different spike moves can each bounce once). Fixed bounce height below a damage threshold (data, ~20-30%), higher with knockback above it. Hitstun keeps counting (no reset). No dropping through platforms during hitstun |
@@ -54,6 +55,7 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 | Attacks | Up strong, down strong |
 | Attacks | Neutral aerial, back aerial |
 | Attacks | Dash attack |
+| Movement | Grounded backdash (Street Fighter style): dashing away keeps your facing |
 | Combat | Per-move hurtbox changes (e.g. an extended limb can be hit during a slow attack's startup) |
 
 ## Controls
@@ -78,3 +80,5 @@ moving out. Stretch is only touched after Core is done and CP6 has passed.
 - Oct 19: Added run-turnaround, dash dancing, jump squat + short hop, and reverse aerial rush to Core. Nothing removed: judged essential to movement feel (short hops are needed for aerial combos; with air facing locked, ground facing before a jump decides every aerial). Frame counts live in character data. Built after collision (Oct 26).
 - Oct 21: Hurtboxes stay boxes, not shaped to the sprites (pixel shapes feel unfair, tie balance to the art and cost days). One 48 x 90 box per fighter in Core; per-state sizes in Polish if playtesting needs it; per-move hurtboxes in Stretch.
 - Oct 27: Added ground bounce to Core (gives down aerial an on-stage combo use). Nothing removed: small, and part of how knockback meets the stage. Raises the priority of combo scaling, since low-% bounce loops are the main infinite risk.
+- Oct 28: Added landing lag to Core, built with jump squat + short hop. Nothing removed: small, and it makes aerial timing matter, which fits landing cancelling aerials during startup.
+- Nov 25: Added a grounded backdash to Stretch (requested by the art chat, which is drawing a `dash_back` sprite for it).

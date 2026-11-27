@@ -26,7 +26,9 @@ The player will play against another player or a CPU opponent and try to kill th
 - Freeform combo openers:  
 	- Character 1: Stun (I)  
 		- Only certain attacks will stun  
-		- Base knockback of stun attacks will be halved (maybe quartered)  
+		- Stunned opponents are frozen in place for 1 second (fixed), even in the air  
+			- Another stun hit restarts the freeze; non-stun hits don't  
+			- Hits taken while frozen are saved: when the stun ends, one launch as strong as the last hit, in the average direction of all of them  
 			- Opens up combo routes  
 		- Stun wears off after 3-5? stun attacks  
 			- Start with 5, adjust when balancing/testing  

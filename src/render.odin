@@ -16,6 +16,8 @@ SOFT_EDGE_COLOR     :: rl.Color{200, 200, 215, 255}
 HUD_PANEL_COLOR     :: rl.Color{20, 20, 28, 170}
 TEXT_SHADOW_COLOR   :: rl.Color{0, 0, 0, 200}
 HITBOX_COLOR        :: rl.Color{255, 60, 60, 140}
+SLOW_TINT           :: rl.Color{140, 190, 255, 255} // slowed fighters are drawn bluish
+SLOW_CLOCK_COLOR    :: rl.Color{110, 200, 255, 255}
 BODY_BOX_COLOR      :: rl.Color{255, 255, 0, 160}
 
 // Chosen to stay clear of Lucy's pink, teal, gold and dark purple.
@@ -33,6 +35,7 @@ STATE_LABELS := [Fighter_State]cstring {
 	.Dash     = "dash",
 	.Attack   = "attack",
 	.Hitstun  = "hitstun",
+	.Stunned  = "stunned",
 }
 
 MOVE_LABELS := [Move]cstring {
@@ -142,25 +145,35 @@ draw_match :: proc(game: Game, assets: Assets) {
 		if i == 1 && game.mode == .Vs_Cpu do name = rl.TextFormat("CPU %s", f.character.display_name)
 		draw_text(assets, name, x, 600, 30, PLAYER_COLORS[i])
 		draw_text(assets, rl.TextFormat("%.0f%%   stocks: %d", f.damage, f.stocks), x, 640, 22, rl.RAYWHITE)
-		if f.time_scale != 1 {
-			draw_text(assets, rl.TextFormat("SLOWED x%.2f", f.time_scale), x, 670, 18, rl.SKYBLUE)
+		if f.state == .Stunned {
+			draw_text(assets, "STUNNED", x, 670, 18, rl.YELLOW)
+		} else if f.slow_left > 0 {
+			draw_text(assets, rl.TextFormat("SLOWED %.1fs", f32(f.slow_left) / TICK_RATE), x, 670, 18, rl.SKYBLUE)
 		}
 	}
-	draw_text_centered(assets, "F1: Slow on P2   F2: show boxes   F5: reload data   (debug)", 694, 16, rl.RAYWHITE)
+	draw_text_centered(assets, "F2: show boxes   F5: reload data   (debug)", 694, 16, rl.RAYWHITE)
 }
 
 draw_fighter :: proc(f: Fighter, player: int, assets: Assets, show_boxes: bool) {
 	color := PLAYER_COLORS[player]
 	body := fighter_body(f)
 
+	// A stunned fighter vibrates (only on screen: its real position is frozen).
+	draw_pos := f.pos
+	if f.state == .Stunned {
+		draw_pos.x += 3 if (f.state_frame / 2) % 2 == 0 else -3
+	}
+
 	// Real art if this character has this animation, else the placeholder.
-	// Real art is full colour, so it is drawn untinted (WHITE = no change).
+	// Real art is full colour, so it is drawn untinted (WHITE = no change),
+	// except bluish while slowed.
 	anim := fighter_anim(f)
 	art := assets.character_sprites[f.character.id][anim]
+	slowed := f.slow_left > 0
 	if rl.IsTextureValid(art.texture) {
-		draw_sprite(art, anim_frame(f, anim, art.frame_count), f.pos, f.facing, rl.WHITE)
+		draw_sprite(art, anim_frame(f, anim, art.frame_count), draw_pos, f.facing, SLOW_TINT if slowed else rl.WHITE)
 	} else {
-		draw_sprite(assets.fighter_sprite, 0, f.pos, f.facing, color)
+		draw_sprite(assets.fighter_sprite, 0, draw_pos, f.facing, SLOW_TINT if slowed else color)
 	}
 
 	if show_boxes {
@@ -181,6 +194,15 @@ draw_fighter :: proc(f: Fighter, player: int, assets: Assets, show_boxes: bool) 
 	tag := rl.TextFormat("P%d", player + 1)
 	tag_width := rl.MeasureTextEx(assets.font, tag, 22, TEXT_SPACING).x
 	draw_text(assets, tag, f.pos.x - tag_width / 2, body.y - 30, 22, color)
+
+	// Slow: a small clock next to the tag that empties as the slow runs out.
+	if slowed {
+		center := Vec2{f.pos.x + tag_width / 2 + 16, body.y - 19}
+		left := f32(f.slow_left) / f32(f.rules.slow_ticks)
+		rl.DrawCircleV(center, 10, HUD_PANEL_COLOR)
+		rl.DrawCircleSector(center, 8, -90, -90 + 360 * left, 32, SLOW_CLOCK_COLOR)
+		rl.DrawCircleLinesV(center, 10, rl.RAYWHITE)
+	}
 }
 
 // Which animation a fighter's current state shows.
@@ -193,6 +215,7 @@ fighter_anim :: proc(f: Fighter) -> Anim {
 	case .Dash:     return .Dash
 	case .Attack:   return MOVE_ANIMS[f.move]
 	case .Hitstun:  return .Hitstun
+	case .Stunned:  return .Stunned
 	}
 	return .Idle
 }

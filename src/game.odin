@@ -46,7 +46,6 @@ Game :: struct {
 	// Menu keys are edge-detected per tick (see read_input in fighter.odin
 	// for why we don't use rl.IsKeyPressed inside update).
 	prev_confirm: bool,
-	prev_debug:   bool,
 	prev_reload:  bool,
 	prev_boxes:   bool,
 	prev_menu:    bool, // up/down on the title screen
@@ -148,14 +147,6 @@ game_update :: proc(g: ^Game) {
 }
 
 match_update :: proc(g: ^Game) {
-	// DEBUG: toggle Slow on player 2 to demonstrate per-fighter time scale.
-	debug := rl.IsKeyDown(.F1)
-	if debug && !g.prev_debug {
-		f := &g.fighters[1]
-		f.time_scale = 0.5 if f.time_scale == 1 else 1
-	}
-	g.prev_debug = debug
-
 	for &f, i in g.fighters {
 		input := read_input(g.bindings[i])
 		if i == 1 && g.mode == .Vs_Cpu {

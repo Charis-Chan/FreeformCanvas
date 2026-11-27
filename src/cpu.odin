@@ -197,8 +197,8 @@ cpu_update :: proc(cpu: ^Cpu, me, opponent: Fighter, stage: Stage, config: Cpu_C
 
 // The state machine: what to do in each state, and when to switch.
 cpu_think :: proc(cpu: ^Cpu, me, opponent: Fighter, stage: Stage, config: Cpu_Config) -> Input {
-	// Getting hit overrides everything.
-	if me.state == .Hitstun {
+	// Getting hit (or stunned) overrides everything.
+	if me.state == .Hitstun || me.state == .Stunned {
 		cpu_set_state(cpu, .Hitstun)
 		return {}
 	}

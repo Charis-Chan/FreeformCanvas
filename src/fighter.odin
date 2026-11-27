@@ -166,6 +166,7 @@ Fighter_State :: enum {
 	Dash,    // ground dash and air dash
 	Attack,  // which one is in `move`
 	Hitstun, // knocked back, can't act until hitstun_left runs out
+	Stunned, // frozen in place by a Stun hit until stun_left runs out
 }
 
 Fighter :: struct {
@@ -191,6 +192,22 @@ Fighter :: struct {
 	b_reversed: bool, // already B-reversed during the current attack
 	hit_landed: bool,
 	hitstun_left: int,
+
+	// Stun (Lucy's opener). While stunned, hits don't launch: their launch
+	// directions are added up here, and the last hit's knockback is kept.
+	// When the stun ends, the fighter is launched once with that knockback
+	// in the average of those directions.
+	stun_left:        int,  // ticks of stun remaining
+	stun_dir_total:   Vec2, // sum of the saved launch directions
+	stun_last_dir:    Vec2, // used if the saved directions cancel out
+	stun_knockback:   f32,  // knockback of the last hit taken while stunned
+	stuns_this_combo: int,  // stun hits taken in the current combo
+	stun_cooldown:    int,  // ticks until this fighter can be stunned again
+	free_ticks:       int,  // ticks since last in hitstun or stun (ends a combo)
+
+	// Slow (David's opener), counted in real game ticks, not slowed ones.
+	slow_left:     int, // ticks of slow remaining
+	slow_cooldown: int, // ticks until this fighter can be slowed again
 
 
 	damage: f32,
@@ -240,6 +257,13 @@ fighter_respawn :: proc(f: ^Fighter, spawn: Vec2) {
 	f.air_dashes_left = f.character.stats.max_air_dashes
 	f.dash_cooldown = 0
 	f.tap_timer = 0
+	// A new stock starts with no openers on it.
+	f.stun_left = 0
+	f.stuns_this_combo = 0
+	f.stun_cooldown = 0
+	f.slow_left = 0
+	f.slow_cooldown = 0
+	f.time_scale = 1
 	set_state(f, .Airborne)
 }
 
@@ -252,6 +276,7 @@ set_state :: proc(f: ^Fighter, state: Fighter_State) {
 
 // Called once per game tick. Runs 0, 1 or more steps depending on time_scale.
 fighter_update :: proc(f: ^Fighter, input: Input, stage: Stage) {
+	update_opener_timers(f)
 	f.held_since_step += input - DIRECTIONS
 	f.time_accum += f.time_scale
 	for f.time_accum >= 1 {
@@ -362,10 +387,17 @@ fighter_step :: proc(f: ^Fighter, input: Input, stage: Stage) {
 		if f.hitstun_left <= 0{
 			set_state(f, .Idle if f.grounded else .Airborne)
 		}
+
+	case .Stunned:
+		// Frozen exactly where it was hit: no movement, no gravity.
+		f.vel = {}
+		f.stun_left -= 1
+		if f.stun_left <= 0 do launch_after_stun(f)
 	}
 
-	// Physics. Dashes ignore gravity for their duration.
-	if f.state != .Dash {
+	// Physics. Dashes ignore gravity for their duration; stunned fighters
+	// are frozen.
+	if f.state != .Dash && f.state != .Stunned {
 		f.vel.y = min(f.vel.y + s.gravity, s.max_fall_speed)
 	}
 	prev_feet_y := f.pos.y
